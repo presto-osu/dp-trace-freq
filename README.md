@@ -1,2 +1,3 @@
-# dp-trace-freq
-Differential privacy for frequency analysis of software traces. This repo contains the code for the frequency part in Yu's dissertation.
+This is the release of artifact for Chapter 4 and 5 in Yu's dissertation.
+
+Please follow the guide [here](code) to reproduce the results in the paper.
