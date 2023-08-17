@@ -1,10 +1,10 @@
-This is the guide for building and running the artifact, and reproducing the experimental results described in the evaluation of Chapter 4.
+This is the guide for building and running the artifact, and reproducing the experimental results described in the evaluation of Chapter 4 and Chapter 5.
 
 ## Code Structure
 The project is a [Gradle](https://gradle.org/) project.
 
 - `src` contains the source code.
-- `run.sh` is a start-up script for running the program.
+- `run.sh`, `run_config_rows.sh`, and `run_batch.sh` are start-up scripts for running the programs.
 - `plot_ne.py` is a python script that plots the figures of normalized error.
 - `plot_hh.py` is a python script that plots the figures of recall and precision.
 - Other files/folders are for Gradle.
@@ -43,7 +43,7 @@ $ ./gradlew shadowJar
 ```
 
 ### Usage
-Instead of running the analyses by invoking the `java` command, we provide a wrapping script `run.sh` for convinience. The instructions for reproducing the results are based on this script. Here's the description about how to use the script.
+Instead of running the analyses by invoking the `java` command, we provide some wrapping scripts `run.sh`, `run_config_rows.sh`, and `run_batch.sh` for convinience. The instructions for reproducing the results are based on the scripts. Here's the description about how to use `run.sh` for the experiments in Chapter 4. Usage of `run_config_rows.sh` and `run_batch.sh` is similar.
 
 The fisrt two parameters have to be set at the beginning.
 
@@ -75,7 +75,7 @@ The file `apps` contains the list of all the apps evaluated in the paper. To run
 **Save the result**
 To save the result printed by the experiments to a file, append ` | tee FILE_PATH` to the command.
 
-## Reproducing The Results
+## Reproducing The Results in Chapter 4
 To reproduce the results presented in the evaluation section of Chapter 4. Run the following commands.
 ```bash
 $ bash run.sh "`cat apps`" 30 -dir ../traces -protect 25 -epsilon 0.5 | tee output_cc_presence_pr25_ep0_5.txt
@@ -131,4 +131,21 @@ To plot the figures, run the following:
 ```bash
 $ python3 plot_ne.py
 $ python3 plot_hh.py
+```
+
+## Reproducing The Results in Chapter 5
+To reproduce the characterization study on the number of rows in count sketch (Section 5.1), change the parameters for sketch size.
+```bash
+# This example shows how to set the number of rows as 128 and increase the number of columns by 2 so that the overall size is fixed.
+bash run.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0 -rows 128 -col-multiply 2
+```
+To run the experiments for the refinement of configuration of rows, use `run_config_rows.sh`. The parameters are same as `run.sh` except that `-rows` and `-col-multiply` are not needed.
+E.g.
+```bash
+bash run_config_rows.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0
+```
+To run the experiments for the refinement of batched users, use `run_batch.sh`. The parameters are same as `run.sh`.
+E.g.
+```bash
+bash run_batch.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0
 ```
