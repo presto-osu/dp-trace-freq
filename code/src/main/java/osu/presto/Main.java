@@ -193,6 +193,8 @@ public class Main {
 
         // Difficulty map, for getting the "real" tau.
         Map<String, Integer> diff_map = new HashMap<>();
+        int num_users_smaller_tau = 0;
+        int num_users_bigger_tau = 0;
         for (int i = 0; i < trace_list.size(); i++) {
             int users = args.replication - opt_in_users[i];
             if (users == 0) continue;
@@ -206,6 +208,12 @@ public class Main {
                 t = Tree.createCallingContextTree(trace, args.depth_limit);
             }
             global_tree.merge(t, users);
+            int tau_local = getLocalTau(t);
+            if (tau_local < tau) {
+                num_users_smaller_tau += users;
+            } else if (tau_local > tau) {
+                num_users_bigger_tau += users;
+            }
             for (Tree.Node n: t.all_nodes) {
                 int diff_max = diff_map.getOrDefault(n.long_id, 0);
                 int diff = args.hot ? (n.freq - hideHotnessThreshold) : n.prefix_freq;
@@ -229,10 +237,14 @@ public class Main {
 
         int size_opt_in = global_tree_optin.all_nodes.size();
         int size_opt_out = global_tree.all_nodes.size();
+        double ratio_users_smaller_tau = ((double)num_users_smaller_tau) / num_users_opt_out;
+        double ratio_users_bigger_tau = ((double)num_users_bigger_tau) / num_users_opt_out;
         System.out.println("\b\b\b 100% done. [total nodes: " + size_opt_out +
                 ", depth: " + global_tree.depth +
                 ", size_ratio_in_to_out: " + ((double)size_opt_in)/size_opt_out +
-                ", tau_real: " + tau_real + "]");
+                ", tau_real: " + tau_real +
+                ", smaller_tau_users: " + num_users_smaller_tau + "(" + ratio_users_smaller_tau + ")" +
+                ", bigger_tau_users: " + num_users_bigger_tau + "(" + ratio_users_bigger_tau + ")" + "]");
     }
 
     // L1 norm normalized by the expected value of max L1 norm. The estimates of freqs are the raw value in sketch,
@@ -340,4 +352,24 @@ public class Main {
         System.out.println("RE-HH: " + re);
     }
 
+    public static int getLocalTau(Tree t) {
+        ArrayList<Integer> diff_list = new ArrayList<>();
+        for (Tree.Node n : t.all_nodes) {
+            if (args.hot) {
+                int diff = n.freq - hideHotnessThreshold;
+                if (diff > 0) {
+                    diff_list.add(diff);
+                }
+            } else {
+                int diff = n.prefix_freq;
+                diff_list.add(diff);
+            }
+        }
+        diff_list.sort(null);
+        int idx = ((int) (diff_list.size() * args.protect / 100.0)) - 1;
+        if (idx < 0) {
+            idx = 0;
+        }
+        return diff_list.size() == 0 ? 0 : diff_list.get(idx);
+    }
 }
