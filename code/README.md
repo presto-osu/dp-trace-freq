@@ -137,15 +137,15 @@ $ python3 plot_hh.py
 To reproduce the characterization study on the number of rows in count sketch (Section 5.1), change the parameters for sketch size.
 ```bash
 # This example shows how to set the number of rows as 128 and increase the number of columns by 2 so that the overall size is fixed.
-bash run.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0 -rows 128 -col-multiply 2
+bash run.sh "`cat apps`" 5 -dir ../traces -protect 50 -epsilon 2.0 -rows 128 -col-multiply 2
 ```
 To run the experiments for the refinement of configuration of rows, use `run_config_rows.sh`. The parameters are same as `run.sh` except that `-rows` and `-col-multiply` are not needed.
 E.g.
 ```bash
-bash run_config_rows.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0
+bash run_config_rows.sh "`cat apps`" 5 -dir ../traces -rep 10 -protect 50 -epsilon 2.0
 ```
 To run the experiments for the refinement of batched users, use `run_batch.sh`. The parameters are same as `run.sh`.
 E.g.
 ```bash
-bash run_batch.sh "`cat apps`" 30 -dir ../traces -protect 50 -epsilon 2.0
+bash run_batch.sh "`cat apps`" 5 -dir ../traces -rep 10 -protect 50 -epsilon 2.0
 ```
